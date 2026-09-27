@@ -2,6 +2,7 @@
   "name": "discofetch",
   "type": "module",
   "version": "0.3.2",
+  "packageManager": "pnpm@12.6.0",
   "description": "🪩 The fetch client that types itself.",
   "author": {
     "name": "Frederik Bußmann",
@@ -10,15 +11,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/freb97/discofetch"
+    "url": "https://github.com/bussmann-io/discofetch"
   },
   "bugs": {
-    "url": "https://github.com/freb97/discofetch/issues"
+    "url": "https://github.com/bussmann-io/discofetch/issues"
   },
-  "workspaces": [
-    "examples/*",
-    "."
-  ],
   "keywords": [
     "api",
     "client",
@@ -69,21 +66,22 @@
   ],
   "scripts": {
     "build": "nuxt-module-build build",
+    "prepack": "pnpm run prepare && pnpm run build",
     "prepare": "nuxt-module-build prepare",
     "test": "vitest",
     "lint": "eslint .",
-    "nuxt:prepare": "bun --filter=nuxt-example run prepare",
-    "nuxt:dev": "bun --filter=nuxt-example run dev",
-    "nuxt:build": "bun --filter=nuxt-example run build",
-    "vite:dev": "bun --filter=vite-example run dev",
-    "vite:build": "bun --filter=vite-example run build",
+    "nuxt:prepare": "pnpm --filter=nuxt-example run prepare",
+    "nuxt:dev": "pnpm --filter=nuxt-example run dev",
+    "nuxt:build": "pnpm --filter=nuxt-example run build",
+    "vite:dev": "pnpm --filter=vite-example run dev",
+    "vite:build": "pnpm --filter=vite-example run build",
     "typecheck": "vue-tsc --noEmit"
   },
   "peerDependencies": {
     "@nuxt/kit": "^4",
-    "@nuxt/schema": "^3",
+    "@nuxt/schema": "^4",
     "nuxt": "^4",
-    "vite": "^7"
+    "vite": "^7 || ^8"
   },
   "peerDependenciesMeta": {
     "@nuxt/kit": {
@@ -100,22 +98,23 @@
     }
   },
   "dependencies": {
-    "autodisco": "^0.4.3",
+    "autodisco": "^2.1.0",
     "consola": "^3.4.2",
-    "openapi-fetch": "^0.15.0",
-    "openapi-typescript": "^7.10.1",
-    "unplugin": "^2.3.11"
+    "defu": "^6.1.7",
+    "openapi-fetch": "^0.17.0",
+    "openapi-typescript": "^7.13.0",
+    "unplugin": "^3.4.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^6.2.0",
-    "@nuxt/kit": "^4.2.1",
-    "@nuxt/module-builder": "^1.0.2",
-    "@nuxt/schema": "^4.2.1",
-    "@types/node": "^20.19.24",
-    "eslint": "^9.39.1",
-    "nuxt": "^4.2.1",
-    "typescript": "^5.9.3",
+    "@antfu/eslint-config": "^9.5.1",
+    "@nuxt/kit": "^4.5.2",
+    "@nuxt/module-builder": "^1.0.3",
+    "@nuxt/schema": "^4.5.2",
+    "@types/node": "^26.6.3",
+    "eslint": "^10.11.0",
+    "nuxt": "^4.5.2",
+    "typescript": "^6.0.3",
     "unbuild": "^3.6.1",
-    "vue-tsc": "^3.1.5"
+    "vue-tsc": "^3.3.11"
   }
 }

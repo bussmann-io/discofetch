@@ -21,12 +21,12 @@ at build time and creates a fully-typed fetch client for runtime use with zero o
 
 ## How It Works
 
-Discofetch is built on top of [autodisco](https://github.com/freb97/autodisco),
+Discofetch is built on top of [autodisco](https://github.com/bussmann-io/autodisco),
 which automatically generates OpenAPI schemas by sending probe requests to your API endpoints
 and analyzing the responses. The workflow is:
 
 1. **Discovery Phase** (Build time): You define which endpoints to probe with sample parameters
-2. **Type Generation** (Build time): [autodisco](https://github.com/freb97/autodisco) infers the API structure and generates TypeScript types using [openapi-typescript](https://github.com/openapi-ts/openapi-typescript)
+2. **Type Generation** (Build time): [autodisco](https://github.com/bussmann-io/autodisco) infers the API structure and generates TypeScript types using [openapi-typescript](https://github.com/openapi-ts/openapi-typescript)
 3. **Type-Safe Client** (Runtime): A fetch client powered by [openapi-fetch](https://github.com/openapi-ts/openapi-typescript/tree/main/packages/openapi-fetch) provides fully-typed methods for your API
 
 This gives you autocompletion, type checking, and IntelliSense for legacy APIs without manual type definitions.
@@ -294,23 +294,29 @@ export default defineNuxtConfig({
 
 ### Hooks Reference
 
-Hooks allow you to customize the discovery process at various stages. All hooks from [autodisco](https://github.com/freb97/autodisco) are available:
+Hooks allow you to customize the discovery process at various stages. All hooks from [autodisco](https://github.com/bussmann-io/autodisco) are available:
 
-| Hook Name               | Props                                            | Description                                           |
-|-------------------------|--------------------------------------------------|-------------------------------------------------------|
-| `discovery:start`       | `config`                                         | Called when the discovery process begins              |
-| `probe:request`         | `method`, `path`, `config`                       | Called before each API probe request is made          |
-| `probe:response`        | `method`, `path`, `config`, `response`           | Called after each API probe response is received      |
-| `probes:completed`      | `config`, `results`                              | Called when all API probing is complete               |
-| `zod:generate`          | `method`, `name`, `inputData`, `rendererOptions` | Called before generating Zod schemas using quicktype  |
-| `zod:generated`         | `config`                                         | Called after Zod schema files have been generated     |
-| `zod:runtime:generate`  | `method`, `path`, `config`, `sample`             | Called before generating runtime Zod schemas          |
-| `zod:runtime:generated` | `config`, `results`                              | Called after runtime Zod schemas have been generated  |
-| `openapi:generate`      | `config`, `components`, `paths`                  | Called before generating the OpenAPI schema           |
-| `openapi:generated`     | `config`, `result`                               | Called after the OpenAPI schema has been generated    |
-| `typescript:generate`   | `config`, `openapiTSOptions`                     | Called before generating TypeScript types             |
-| `typescript:generated`  | `config`, `result`                               | Called after TypeScript types have been generated     |
-| `discovery:completed`   | `config`, `totalTime`, `totalProbingTime`        | Called when the entire discovery process is completed |
+| Hook Name                      | Props                                                | Description                                               |
+|--------------------------------|------------------------------------------------------|-----------------------------------------------------------|
+| `discovery:start`              | `config`                                             | Called when the discovery process begins                  |
+| `discovery:completed`          | `config`, `totalTime`, `totalProbingTime`            | Called when the entire discovery process is completed     |
+| `probe:request`                | `method`, `path`, `probeConfig`                      | Called before each API probe request is made              |
+| `probe:response`               | `method`, `path`, `probeConfig`, `response`          | Called after each API probe response is received          |
+| `probes:completed`             | `config`, `results`                                  | Called when all API probing is complete                   |
+| `zod:runtime:generate`         | `config`, `method`, `path`, `schemaConfig`, `sample` | Called before generating runtime Zod schemas              |
+| `zod:runtime:generated`        | `config`, `results`                                  | Called after runtime Zod schemas have been generated      |
+| `zod:generate`                 | `config`, `method`, `name`, `schema`                 | Called before generating Zod schema files                 |
+| `zod:generated`                | `config`, `result`                                   | Called after Zod schema files have been generated         |
+| `json:generate`                | `config`, `method`, `name`, `schema`                 | Called before generating JSON schema files                |
+| `json:generated`               | `config`, `result`                                   | Called after JSON schema files have been generated        |
+| `typescript:generate`          | `config`, `method`, `name`, `schema`                 | Called before generating TypeScript type files            |
+| `typescript:generated`         | `config`, `result`                                   | Called after TypeScript type files have been generated    |
+| `markdown:generate`            | `config`, `nodes`, `separator`                       | Called before generating Markdown documentation           |
+| `markdown:generated`           | `config`, `result`                                   | Called after Markdown documentation has been generated    |
+| `openapi:generate`             | `config`, `components`, `paths`                      | Called before generating the OpenAPI schema               |
+| `openapi:generated`            | `config`, `result`                                   | Called after the OpenAPI schema has been generated        |
+| `openapi:typescript:generate`  | `config`, `openapiTSOptions`                         | Called before generating OpenAPI TypeScript types         |
+| `openapi:typescript:generated` | `config`, `result`                                   | Called after OpenAPI TypeScript types have been generated |
 
 Example usage:
 
@@ -329,13 +335,13 @@ export default defineNuxtConfig({
       'discovery:start': (config) => {
         console.log('Starting API discovery...')
       },
-      'probe:request': (method, path, config) => {
+      'probe:request': (method, path, probeConfig) => {
         console.log(`Probing ${method.toUpperCase()} ${path}`)
       },
       'probes:completed': (config, results) => {
         console.log(`Probed ${results.length} endpoints`)
       },
-      'typescript:generated': (config, result) => {
+      'openapi:typescript:generated': (config, result) => {
         console.log('TypeScript types generated!')
       },
       'discovery:completed': (config, totalTime, totalProbingTime) => {
@@ -357,13 +363,19 @@ export default defineNuxtConfig({
       get: { '/users': {} },
     },
 
-    // Generate Zod schemas for runtime validation
     generate: {
-      zod: false, // Enable Zod schema generation
-      typescript: { // Options for openapi-typescript
-        strictNullChecks: true,
-        // Other options...
+      openapi: {
+        typescript: { // Options for openapi-typescript
+          alphabetize: true,
+          // Other options...
+        },
       },
+
+      // Additional outputs, all disabled by default
+      zod: false, // Zod schemas for runtime validation
+      json: false, // JSON schemas
+      typescript: false, // TypeScript types per endpoint
+      markdown: false, // Markdown API documentation
     },
 
     // Custom logger configuration (uses Consola)
@@ -406,17 +418,17 @@ Discofetch may not be the best fit if:
 
 This project is built with the following libraries:
 
-- [autodisco](https://github.com/freb97/autodisco) - Automatic REST API discovery and OpenAPI generation
+- [autodisco](https://github.com/bussmann-io/autodisco) - Automatic REST API discovery and OpenAPI generation
 - [openapi-fetch](https://github.com/openapi-ts/openapi-typescript/tree/main/packages/openapi-fetch) - Type-safe fetch client
 - [openapi-typescript](https://github.com/openapi-ts/openapi-typescript) - TypeScript types from OpenAPI schemas
 - [zod-openapi](https://github.com/samchungy/zod-openapi) - OpenAPI schemas from Zod
 
 ## 📜 License
 
-Published under the [MIT License](https://github.com/freb97/discofetch/tree/main/LICENSE).
+Published under the [MIT License](https://github.com/bussmann-io/discofetch/tree/main/LICENSE).
 
-[github-actions-src]: https://github.com/freb97/discofetch/actions/workflows/test.yml/badge.svg
-[github-actions-href]: https://github.com/freb97/discofetch/actions
+[github-actions-src]: https://github.com/bussmann-io/discofetch/actions/workflows/test.yml/badge.svg
+[github-actions-href]: https://github.com/bussmann-io/discofetch/actions
 
 [npm-version-src]: https://img.shields.io/npm/v/discofetch/latest.svg?style=flat&colorA=18181B&colorB=31C553
 [npm-version-href]: https://npmjs.com/package/discofetch
@@ -424,5 +436,5 @@ Published under the [MIT License](https://github.com/freb97/discofetch/tree/main
 [npm-last-update-src]: https://img.shields.io/npm/last-update/discofetch.svg?style=flat&colorA=18181B&colorB=31C553
 [npm-last-update-href]: https://npmjs.com/package/discofetch
 
-[license-src]: https://img.shields.io/github/license/freb97/discofetch.svg?style=flat&colorA=18181B&colorB=31C553
-[license-href]: https://github.com/freb97/discofetch/tree/main/LICENSE
+[license-src]: https://img.shields.io/github/license/bussmann-io/discofetch.svg?style=flat&colorA=18181B&colorB=31C553
+[license-href]: https://github.com/bussmann-io/discofetch/tree/main/LICENSE

@@ -3,7 +3,8 @@
 pkgs.mkShell {
     buildInputs = [
         pkgs.nodejs
-        pkgs.bun
+        pkgs.pnpm
         pkgs.git
+        pkgs.gh
     ];
 }

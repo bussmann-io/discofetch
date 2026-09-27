@@ -1,9 +1,11 @@
 import type { DiscoverConfig } from 'autodisco'
 
 import { stat } from 'node:fs/promises'
-import { addImports, addServerImports, addTemplate, createResolver, defineNuxtModule, updateRuntimeConfig, useLogger } from '@nuxt/kit'
+import { addImports, addServerImports, addTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit'
 import discover from 'autodisco'
+import { defu } from 'defu'
 
+import { getGenerateConfig } from './config/generate'
 import { getRuntimeConfig } from './config/runtime'
 import { augmentClient } from './templates/augment'
 
@@ -15,6 +17,16 @@ export interface ModuleOptions extends DiscoverConfig {
 }
 
 declare module '@nuxt/schema' {
+  interface RuntimeConfig {
+    discofetch: Pick<ModuleOptions, 'baseUrl' | 'headers'>
+  }
+
+  interface PublicRuntimeConfig {
+    discofetch: Pick<ModuleOptions, 'baseUrl' | 'headers'>
+  }
+}
+
+declare module 'nuxt/schema' {
   interface RuntimeConfig {
     discofetch: Pick<ModuleOptions, 'baseUrl' | 'headers'>
   }
@@ -59,10 +71,7 @@ export default defineNuxtModule<ModuleOptions>({
     await discover({
       ...options,
 
-      generate: {
-        zod: options.generate?.zod ?? false,
-        typescript: options.generate?.typescript ?? true,
-      },
+      generate: getGenerateConfig(options),
 
       outputDir: options.outputDir ?? outputDir,
     })
@@ -93,9 +102,7 @@ export default defineNuxtModule<ModuleOptions>({
     addServerImports(imports)
     addImports(imports)
 
-    updateRuntimeConfig({
-      discofetch: getRuntimeConfig(options),
-    })
+    nuxt.options.runtimeConfig.discofetch = defu(getRuntimeConfig(options), nuxt.options.runtimeConfig.discofetch)
 
     nuxt.options.nitro.typescript ??= {}
     nuxt.options.nitro.typescript.tsConfig ??= {}
@@ -106,9 +113,7 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.typescript.tsConfig.include.push(outputDir)
 
     if (!options.private) {
-      updateRuntimeConfig({
-        public: { discofetch: getRuntimeConfig(options) },
-      })
+      nuxt.options.runtimeConfig.public.discofetch = defu(getRuntimeConfig(options), nuxt.options.runtimeConfig.public.discofetch)
     }
   },
 })

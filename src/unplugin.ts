@@ -4,10 +4,12 @@ import type { UnpluginFactory } from 'unplugin'
 
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
+import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import discover from 'autodisco'
 import { createUnplugin } from 'unplugin'
 
+import { getGenerateConfig } from './config/generate'
 import { getRuntimeConfig } from './config/runtime'
 import { augmentClient } from './templates/augment'
 
@@ -29,7 +31,7 @@ export type PluginConfig = Omit<DiscoverConfig, 'logger'> & {
 
 export const unpluginFactory: UnpluginFactory<PluginConfig | undefined> = (options) => {
   const resolver = createResolver(import.meta.url)
-  const outputDir = options?.outputDir || resolver.resolve('../../../.discofetch')
+  const outputDir = options?.outputDir || resolve(process.cwd(), 'node_modules/.discofetch')
 
   return {
     name: 'unplugin-discofetch',
@@ -41,10 +43,7 @@ export const unpluginFactory: UnpluginFactory<PluginConfig | undefined> = (optio
       await discover({
         ...options,
         outputDir,
-        generate: {
-          zod: options.generate?.zod ?? false,
-          typescript: options.generate?.typescript ?? true,
-        },
+        generate: getGenerateConfig(options),
       })
 
       await mkdir(outputDir, { recursive: true })
