@@ -2,7 +2,7 @@
   "name": "discofetch",
   "type": "module",
   "version": "0.3.3",
-  "packageManager": "pnpm@12.6.0",
+  "packageManager": "pnpm@12.8.1",
   "description": "🪩 The fetch client that types itself.",
   "author": {
     "name": "Frederik Bußmann",
