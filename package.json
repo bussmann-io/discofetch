@@ -78,9 +78,9 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "peerDependencies": {
-    "@nuxt/kit": "^4",
-    "@nuxt/schema": "^4",
-    "nuxt": "^4",
+    "@nuxt/kit": "^4.5.2",
+    "@nuxt/schema": "^4.5.2",
+    "nuxt": "^4.5.2",
     "vite": "^7 || ^8"
   },
   "peerDependenciesMeta": {
