@@ -2,7 +2,7 @@
   "name": "discofetch",
   "type": "module",
   "version": "0.3.3",
-  "packageManager": "pnpm@12.15.0",
+  "packageManager": "pnpm@12.16.1",
   "description": "🪩 The fetch client that types itself.",
   "author": {
     "name": "Frederik Bußmann",
@@ -78,9 +78,9 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "peerDependencies": {
-    "@nuxt/kit": "^4.6.2",
-    "@nuxt/schema": "^4.6.2",
-    "nuxt": "^4.6.2",
+    "@nuxt/kit": "^4.6.3",
+    "@nuxt/schema": "^4.6.3",
+    "nuxt": "^4.6.3",
     "vite": "^7 || ^8"
   },
   "peerDependenciesMeta": {
@@ -103,18 +103,18 @@
     "defu": "^6.1.7",
     "openapi-fetch": "^0.17.0",
     "openapi-typescript": "^7.13.0",
-    "unplugin": "^3.4.0"
+    "unplugin": "^3.7.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.5.1",
-    "@nuxt/kit": "^4.6.2",
+    "@nuxt/kit": "^4.6.3",
     "@nuxt/module-builder": "^1.0.3",
-    "@nuxt/schema": "^4.6.2",
-    "@types/node": "^26.6.5",
+    "@nuxt/schema": "^4.6.3",
+    "@types/node": "^26.6.6",
     "eslint": "^10.13.0",
-    "nuxt": "^4.6.2",
+    "nuxt": "^4.6.3",
     "typescript": "^6.0.3",
     "unbuild": "^3.6.1",
-    "vue-tsc": "^3.3.13"
+    "vue-tsc": "^3.3.14"
   }
 }
